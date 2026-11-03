@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Tasks — Simple To-Do List</title>
+    <meta
+      name="description"
+      content="My Tasks is a minimalist, responsive to-do list app built with HTML5, CSS3 and vanilla JavaScript. Your tasks are stored in your browser."
+    />
+    <meta name="theme-color" content="#F5F6FA" id="meta-theme-color" />
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
+
+    <!-- Stylesheets are loaded in cascade order: tokens, base, layout, components, responsive -->
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- ============ HEADER ============ -->
+      <header class="app-header">
+        <div class="app-header__brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m4 12.5 5 5L20 6.5" />
+            </svg>
+          </span>
+          <div class="app-header__titles">
+            <h1 class="app-title">My Tasks</h1>
+            <p class="app-subtitle">Organize your day, one task at a time.</p>
+          </div>
+        </div>
+
+        <div class="app-header__meta">
+          <div class="date-chip">
+            <span class="date-chip__label">Today</span>
+            <p class="date-chip__value" id="current-date">—</p>
+          </div>
+
+          <p class="pending-pill" aria-live="polite">
+            <span class="pending-pill__dot" aria-hidden="true"></span>
+            <span><strong id="pending-count">0</strong> pending</span>
+          </p>
+
+          <button
+            type="button"
+            class="theme-toggle"
+            id="theme-toggle"
+            aria-pressed="false"
+            aria-label="Switch to dark mode"
+          >
+            <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+            </svg>
+            <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ============ STATISTICS ============ -->
+      <section class="stats" aria-label="Task statistics">
+        <article class="stat-card">
+          <span class="stat-card__icon stat-card__icon--total" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="17" rx="3" />
+              <path d="M8 9h8M8 14h5" />
+            </svg>
+          </span>
+          <div class="stat-card__content">
+            <p class="stat-card__label">Total Tasks</p>
+            <p class="stat-card__value" id="stat-total">0</p>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-card__icon stat-card__icon--completed" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="m8 12.5 2.5 2.5L16 9.5" />
+            </svg>
+          </span>
+          <div class="stat-card__content">
+            <p class="stat-card__label">Completed</p>
+            <p class="stat-card__value" id="stat-completed">0</p>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-card__icon stat-card__icon--pending" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7.5V12l3 2" />
+            </svg>
+          </span>
+          <div class="stat-card__content">
+            <p class="stat-card__label">Pending</p>
+            <p class="stat-card__value" id="stat-pending">0</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- ============ PROGRESS ============ -->
+      <section class="panel progress-panel" aria-labelledby="progress-heading">
+        <div class="progress-panel__head">
+          <h2 class="panel__title" id="progress-heading">Progress</h2>
+          <p class="progress-panel__value"><strong id="progress-percent">0%</strong> completed</p>
+        </div>
+        <div
+          class="progress"
+          id="progress-track"
+          role="progressbar"
+          aria-labelledby="progress-heading"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        >
+          <div class="progress__fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-panel__hint" id="progress-hint">Add a task to start tracking progress.</p>
+      </section>
+
+      <!-- ============ MAIN LAYOUT ============ -->
+      <div class="layout">
+        <aside class="layout__aside">
+          <section class="panel" aria-labelledby="add-task-heading">
+            <h2 class="panel__title" id="add-task-heading">Add a task</h2>
+
+            <form class="form" id="task-form" novalidate>
+              <div class="field">
+                <label class="field__label" for="task-title">
+                  Task Title <span class="required" aria-hidden="true">*</span>
+                </label>
+                <input
+                  class="input"
+                  id="task-title"
+                  name="title"
+                  type="text"
+                  maxlength="120"
+                  placeholder="e.g. Finish project report"
+                  autocomplete="off"
+                  required
+                />
+                <p class="field__error" id="title-error" role="alert"></p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="task-description">
+                  Description <span class="field__optional">(optional)</span>
+                </label>
+                <textarea
+                  class="input textarea"
+                  id="task-description"
+                  name="description"
+                  rows="3"
+                  maxlength="500"
+                  placeholder="Add more details about this task..."
+                ></textarea>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="task-due-date">Due Date</label>
+                <input class="input" id="task-due-date" name="dueDate" type="date" />
+              </div>
+
+              <div class="form__row">
+                <div class="field">
+                  <label class="field__label" for="task-priority">Priority</label>
+                  <div class="select">
+                    <select id="task-priority" name="priority">
+                      <option value="low">Low</option>
+                      <option value="medium" selected>Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="task-category">Category</label>
+                  <div class="select">
+                    <select id="task-category" name="category">
+                      <option value="personal" selected>Personal</option>
+                      <option value="work">Work</option>
+                      <option value="study">Study</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <p class="form__error" id="form-error" role="alert"></p>
+
+              <button type="submit" class="button button--primary button--full">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add Task
+              </button>
+            </form>
+          </section>
+        </aside>
+
+        <main class="layout__main">
+          <section class="panel" aria-labelledby="task-list-heading">
+            <div class="toolbar">
+              <div class="toolbar__top">
+                <h2 class="panel__title" id="task-list-heading">Your Tasks</h2>
+                <p class="toolbar__count" id="visible-count">Showing 0 of 0</p>
+              </div>
+
+              <div class="search">
+                <svg class="search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.2-3.2" />
+                </svg>
+                <label class="visually-hidden" for="search-input">Search tasks by title</label>
+                <input
+                  class="search__input"
+                  id="search-input"
+                  type="search"
+                  placeholder="Search tasks by title..."
+                  autocomplete="off"
+                />
+                <kbd class="search__kbd" aria-hidden="true">/</kbd>
+              </div>
+
+              <div class="toolbar__filters">
+                <div class="segmented" role="group" aria-label="Filter tasks by status" id="status-filters">
+                  <button type="button" class="segmented__btn is-active" data-status="all" aria-pressed="true">All Tasks</button>
+                  <button type="button" class="segmented__btn" data-status="active" aria-pressed="false">Active</button>
+                  <button type="button" class="segmented__btn" data-status="completed" aria-pressed="false">Completed</button>
+                </div>
+
+                <div class="toolbar__selects">
+                  <label class="visually-hidden" for="category-filter">Filter tasks by category</label>
+                  <div class="select select--compact">
+                    <select id="category-filter">
+                      <option value="all">All Categories</option>
+                      <option value="personal">Personal</option>
+                      <option value="work">Work</option>
+                      <option value="study">Study</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <label class="visually-hidden" for="sort-select">Sort tasks</label>
+                  <div class="select select--compact">
+                    <select id="sort-select">
+                      <option value="newest">Newest First</option>
+                      <option value="oldest">Oldest First</option>
+                      <option value="dueDate">Due Date (Nearest)</option>
+                      <option value="priority">Priority (High to Low)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button type="button" class="button button--ghost button--small" id="clear-completed" disabled>
+                  Clear Completed
+                  <span class="button__count" id="clear-completed-count">0</span>
+                </button>
+              </div>
+            </div>
+
+            <ul class="task-list" id="task-list" aria-live="polite"></ul>
+
+            <div class="empty-state" id="empty-state" hidden>
+              <span class="empty-state__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 4h8a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
+                  <path d="M9.5 3.5h5" />
+                  <path d="m9 11 1.6 1.6L14 9.6" />
+                  <path d="M9 16.5h6" />
+                </svg>
+              </span>
+              <h3 class="empty-state__title" id="empty-title">No tasks yet</h3>
+              <p class="empty-state__text" id="empty-text">Add your first task to get started.</p>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <footer class="app-footer">
+        <p>Your tasks are saved locally in this browser. No account, no server.</p>
+      </footer>
+    </div>
+
+    <!-- ============ EDIT TASK DIALOG ============ -->
+    <dialog class="modal" id="edit-dialog" aria-labelledby="edit-dialog-heading">
+      <form class="modal-card" id="edit-form" novalidate>
+        <div class="modal-header">
+          <h2 class="modal-title" id="edit-dialog-heading">Edit task</h2>
+          <button type="button" class="icon-button" id="edit-close" aria-label="Close edit dialog">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="field">
+            <label class="field__label" for="edit-task-title">
+              Task Title <span class="required" aria-hidden="true">*</span>
+            </label>
+            <input
+              class="input"
+              id="edit-task-title"
+              name="title"
+              type="text"
+              maxlength="120"
+              autocomplete="off"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="edit-task-description">
+              Description <span class="field__optional">(optional)</span>
+            </label>
+            <textarea
+              class="input textarea"
+              id="edit-task-description"
+              name="description"
+              rows="3"
+              maxlength="500"
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="edit-task-due-date">Due Date</label>
+            <input class="input" id="edit-task-due-date" name="dueDate" type="date" />
+          </div>
+
+          <div class="form__row">
+            <div class="field">
+              <label class="field__label" for="edit-task-priority">Priority</label>
+              <div class="select">
+                <select id="edit-task-priority" name="priority">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="edit-task-category">Category</label>
+              <div class="select">
+                <select id="edit-task-category" name="category">
+                  <option value="personal">Personal</option>
+                  <option value="work">Work</option>
+                  <option value="study">Study</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <p class="form__error" id="edit-error" role="alert"></p>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="button button--ghost" id="edit-cancel">Cancel</button>
+          <button type="submit" class="button button--primary">Save Changes</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ============ CONFIRMATION DIALOG ============ -->
+    <dialog class="modal" id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+      <div class="modal-card modal-card--compact">
+        <h2 class="modal-title" id="confirm-title">Delete task?</h2>
+        <p class="modal-message" id="confirm-message"></p>
+        <div class="modal-actions">
+          <button type="button" class="button button--ghost" id="confirm-cancel">Cancel</button>
+          <button type="button" class="button button--danger" id="confirm-ok">Delete</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- ============ TASK CARD TEMPLATE ============ -->
+    <template id="task-template">
+      <li class="task-card">
+        <label class="task-check">
+          <input type="checkbox" class="task-checkbox" data-action="toggle" />
+        </label>
+
+        <div class="task-body">
+          <div class="task-head">
+            <h3 class="task-title"></h3>
+            <div class="task-badges">
+              <span class="badge badge--priority"></span>
+              <span class="badge badge--category"></span>
+            </div>
+          </div>
+          <p class="task-description"></p>
+          <div class="task-meta">
+            <span class="task-due"></span>
+            <span class="task-created"></span>
+          </div>
+        </div>
+
+        <div class="task-actions">
+          <button type="button" class="icon-button" data-action="edit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
+          </button>
+          <button type="button" class="icon-button icon-button--danger" data-action="delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 6h18" />
+              <path d="M8 6V4h8v2" />
+              <path d="m19 6-1 14H6L5 6" />
+              <path d="M10 11v5M14 11v5" />
+            </svg>
+          </button>
+        </div>
+      </li>
+    </template>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <noscript>
+      <p class="noscript">My Tasks needs JavaScript enabled to manage your tasks.</p>
+    </noscript>
+
+    <!-- Classic scripts (no server required): loaded in dependency order -->
+    <script src="js/utils.js" defer></script>
+    <script src="js/storage.js" defer></script>
+    <script src="js/notifications.js" defer></script>
+    <script src="js/tasks.js" defer></script>
+    <script src="js/filters.js" defer></script>
+    <script src="js/ui.js" defer></script>
+    <script src="js/app.js" defer></script>
+  </body>
+</html>
